@@ -1,14 +1,15 @@
 use crate::alien;
 use crate::animations;
 use crate::player;
-use crate::plugins::resolution;
+use crate::plugins;
 use bevy::prelude::*;
 
 pub struct GamePlugin;
 
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(resolution::ResolutionPlugin);
+        app.add_plugins(plugins::resolution::ResolutionPlugin);
+        app.add_plugins(plugins::alien_movement::AlienMovementPlugin);
         app.add_plugins(player::PlayerPlugin);
         app.add_plugins(alien::AlienPlugin);
         app.add_systems(Startup, setup_game);

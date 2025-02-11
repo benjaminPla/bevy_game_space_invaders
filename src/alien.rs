@@ -11,12 +11,7 @@ impl Plugin for AlienPlugin {
 }
 
 #[derive(Component)]
-struct Alien;
-
-// #[derive(Component)]
-// struct AlienMovement {
-// direction: f32,
-// }
+pub struct Alien;
 
 const WIDTH: i32 = 10;
 const HEIGHT: i32 = 5;
@@ -59,13 +54,3 @@ fn setup_alien(
         }
     }
 }
-
-// fn alien_movement(
-// mut query: Query<&mut Transform, &Alien>,
-// mut alien_movement: ResMut<AlienMovement>,
-// time: Res<Time>,
-// ) {
-// for (mut transform, alien) in query.iter_mut() {
-// transform.translation.x = alien_movement.direction * time.delta_secs();
-// }
-// }
