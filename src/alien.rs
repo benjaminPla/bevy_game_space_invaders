@@ -13,16 +13,16 @@ impl Plugin for AlienPlugin {
 #[derive(Component)]
 struct Alien;
 
-#[derive(Component)]
-struct AlienMovement {
-    direction: f32,
-}
+// #[derive(Component)]
+// struct AlienMovement {
+// direction: f32,
+// }
 
 const WIDTH: i32 = 10;
 const HEIGHT: i32 = 5;
 const SPACING: f32 = 35.;
 
-pub fn setup_alien(
+fn setup_alien(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
@@ -60,12 +60,12 @@ pub fn setup_alien(
     }
 }
 
-// pub fn alien_movement(
-    // mut query: Query<&mut Transform, &Alien>,
-    // mut alien_movement: ResMut<AlienMovement>,
-    // time: Res<Time>,
+// fn alien_movement(
+// mut query: Query<&mut Transform, &Alien>,
+// mut alien_movement: ResMut<AlienMovement>,
+// time: Res<Time>,
 // ) {
-    // for (mut transform, alien) in query.iter_mut() {
-        // transform.translation.x = alien_movement.direction * time.delta_secs();
-    // }
+// for (mut transform, alien) in query.iter_mut() {
+// transform.translation.x = alien_movement.direction * time.delta_secs();
+// }
 // }

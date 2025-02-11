@@ -8,6 +8,7 @@ pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, setup_player);
+        app.add_systems(Update, (player_input, player_movement));
     }
 }
 
@@ -28,7 +29,7 @@ impl Player {
     }
 }
 
-pub fn setup_player(
+fn setup_player(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
@@ -56,12 +57,37 @@ pub fn setup_player(
     ));
 }
 
-pub fn player_movement(time: Res<Time>, mut query: Query<(&mut Transform, &mut Player)>) {
+fn player_movement(time: Res<Time>, mut query: Query<(&mut Transform, &mut Player)>) {
     for (mut transform, mut player) in query.iter_mut() {
         let delta_move = player.direction * player.speed * time.delta_secs();
         player.position += delta_move;
 
         transform.translation.x = player.position.x;
         transform.translation.y = player.position.y;
+    }
+}
+
+fn player_input(keys: Res<ButtonInput<KeyCode>>, mut query: Query<&mut Player>) {
+    let mut movement = Vec2::ZERO;
+
+    if keys.pressed(KeyCode::KeyW) {
+        movement.y += 1.0;
+    }
+    if keys.pressed(KeyCode::KeyS) {
+        movement.y -= 1.0;
+    }
+    if keys.pressed(KeyCode::KeyA) {
+        movement.x -= 1.0;
+    }
+    if keys.pressed(KeyCode::KeyD) {
+        movement.x += 1.0;
+    }
+
+    if let Some(mut player) = query.iter_mut().next() {
+        player.direction = if movement.length() > 0.0 {
+            movement.normalize()
+        } else {
+            Vec2::ZERO
+        };
     }
 }

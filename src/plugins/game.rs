@@ -9,10 +9,9 @@ pub struct GamePlugin;
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(resolution::ResolutionPlugin);
-        app.add_systems(
-            Startup,
-            (setup_game, player::setup_player, alien::setup_alien),
-        );
+        app.add_plugins(player::PlayerPlugin);
+        app.add_plugins(alien::AlienPlugin);
+        app.add_systems(Startup, setup_game);
         app.add_systems(Update, animations::execute_animations);
     }
 }
