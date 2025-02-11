@@ -1,7 +1,0 @@
-[
-    (
-        name: "idle",
-        keyframes: KeyframesRange((start: 0, end: 9)),
-        duration: 1.0,
-    ),
-]

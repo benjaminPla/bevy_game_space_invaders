@@ -1,4 +1,5 @@
 use crate::animations;
+use crate::plugins::resolution;
 use bevy::prelude::*;
 
 pub struct AlienPlugin;
@@ -12,30 +13,59 @@ impl Plugin for AlienPlugin {
 #[derive(Component)]
 struct Alien;
 
+#[derive(Component)]
+struct AlienMovement {
+    direction: f32,
+}
+
+const WIDTH: i32 = 10;
+const HEIGHT: i32 = 5;
+const SPACING: f32 = 35.;
+
 pub fn setup_alien(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
+    resolution: Res<resolution::Resolution>,
 ) {
     let texture = asset_server.load("alien.png");
 
-    // the sprite sheet has 7 sprites arranged in a row, and they are all 24px x 24px
     let layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 2, 1, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
 
-    let animation_config = animations::AnimationConfig::new(0, 1, 10);
+    for x in 0..WIDTH {
+        for y in 0..HEIGHT {
+            let position = Vec3::new(x as f32 * SPACING, y as f32 * SPACING, 0.)
+                - (Vec3::X * WIDTH as f32 * SPACING * 0.5)
+                - (Vec3::Y * HEIGHT as f32 * SPACING * 1.5)
+                + (Vec3::Y * resolution.screen_dimensions.y * 0.5);
 
-    commands.spawn((
-        Sprite {
-            image: texture.clone(),
-            texture_atlas: Some(TextureAtlas {
-                layout: texture_atlas_layout.clone(),
-                index: animation_config.get_first_sprite_index(),
-            }),
-            ..default()
-        },
-        Transform::from_xyz(0., 0., 0.),
-        Alien,
-        animation_config,
-    ));
+            let animation_config = animations::AnimationConfig::new(0, 1, 5);
+
+            commands.spawn((
+                Sprite {
+                    image: texture.clone(),
+                    texture_atlas: Some(TextureAtlas {
+                        layout: texture_atlas_layout.clone(),
+                        index: animation_config.get_first_sprite_index(),
+                    }),
+                    ..default()
+                },
+                Transform::from_translation(position)
+                    .with_scale(Vec3::splat(resolution.pixel_ratio)),
+                Alien,
+                animation_config,
+            ));
+        }
+    }
 }
+
+// pub fn alien_movement(
+    // mut query: Query<&mut Transform, &Alien>,
+    // mut alien_movement: ResMut<AlienMovement>,
+    // time: Res<Time>,
+// ) {
+    // for (mut transform, alien) in query.iter_mut() {
+        // transform.translation.x = alien_movement.direction * time.delta_secs();
+    // }
+// }
