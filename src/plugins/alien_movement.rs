@@ -31,10 +31,12 @@ fn alien_movement(
     resolution: Res<resolution::Resolution>,
 ) {
     let mut should_flip_direction = false;
+    let mut should_go_down = false;
 
     for (transform, _alien) in query.iter() {
         if transform.translation.x.abs() >= resolution.screen_dimensions.x / 2.7 {
             should_flip_direction = true;
+            should_go_down = true;
             break;
         }
     }
@@ -44,6 +46,10 @@ fn alien_movement(
     }
 
     for (mut transform, _alien) in query.iter_mut() {
+        if should_go_down {
+            transform.translation.y -= 35.;
+        }
+
         transform.translation.x +=
             alien_movement.direction * alien_movement.speed * time.delta_secs();
     }
