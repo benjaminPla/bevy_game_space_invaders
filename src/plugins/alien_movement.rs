@@ -20,28 +20,31 @@ impl Plugin for AlienMovementPlugin {
 fn setup_alien_movement(mut commands: Commands) {
     commands.insert_resource(AlienMovement {
         direction: 1.,
-        speed: 50.,
+        speed: 200.,
     });
 }
 
 fn alien_movement(
-    mut query: Query<&mut Transform, With<alien::Alien>>,
+    mut query: Query<(&mut Transform, &alien::Alien)>,
     mut alien_movement: ResMut<AlienMovement>,
     time: Res<Time>,
     resolution: Res<resolution::Resolution>,
 ) {
-    for mut transform in query.iter_mut() {
-        let mut should_reverse = false;
+    let mut should_flip_direction = false;
+
+    for (transform, _alien) in query.iter() {
+        if transform.translation.x.abs() >= resolution.screen_dimensions.x / 2.7 {
+            should_flip_direction = true;
+            break;
+        }
+    }
+
+    if should_flip_direction {
+        alien_movement.direction *= -1.;
+    }
+
+    for (mut transform, _alien) in query.iter_mut() {
         transform.translation.x +=
             alien_movement.direction * alien_movement.speed * time.delta_secs();
-
-        if transform.translation.x >= resolution.screen_dimensions.x / 2.0
-            || transform.translation.x <= -resolution.screen_dimensions.x / 2.0
-        {
-            should_reverse = true;
-        }
-        if should_reverse {
-            alien_movement.direction *= -1.0;
-        }
     }
 }
