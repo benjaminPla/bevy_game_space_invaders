@@ -1,3 +1,4 @@
+pub mod alien_death;
 pub mod alien_movement;
 pub mod bullet_movement;
 pub mod game;

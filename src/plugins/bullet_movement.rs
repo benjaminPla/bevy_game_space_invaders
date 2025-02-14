@@ -22,7 +22,7 @@ fn setup_bullet_movement_resource(mut commands: Commands) {
 
 fn bullet_despawn_system(
     mut commands: Commands,
-    query: Query<(Entity, &Transform)>,
+    query: Query<(Entity, &Transform), With<player_shooting::Bullet>>,
     resolution: Res<resolution::Resolution>,
 ) {
     for (entity, transform) in query.iter() {

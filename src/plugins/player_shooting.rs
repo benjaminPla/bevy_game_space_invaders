@@ -1,4 +1,5 @@
 use crate::player;
+use crate::plugins::alien_death;
 use crate::plugins::resolution;
 use bevy::prelude::*;
 
@@ -52,6 +53,7 @@ fn player_shooting(
                     0.,
                 )
                 .with_scale(Vec3::splat(resolution.pixel_ratio)),
+                alien_death::Collider::new(),
                 Bullet::new(&player),
             ));
             player.reset_shoot_time();

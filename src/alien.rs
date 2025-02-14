@@ -1,4 +1,5 @@
 use crate::animations;
+use crate::plugins::alien_death;
 use crate::plugins::resolution;
 use bevy::prelude::*;
 
@@ -48,6 +49,7 @@ fn setup_alien(
                 },
                 Transform::from_translation(position)
                     .with_scale(Vec3::splat(resolution.pixel_ratio)),
+                alien_death::Collider::new(),
                 Alien,
                 animation_config,
             ));

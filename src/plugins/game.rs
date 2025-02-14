@@ -10,6 +10,7 @@ impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(alien::AlienPlugin);
         app.add_plugins(player::PlayerPlugin);
+        app.add_plugins(plugins::alien_death::AlienDeathPlugin);
         app.add_plugins(plugins::alien_movement::AlienMovementPlugin);
         app.add_plugins(plugins::bullet_movement::BulletMovementPlugin);
         app.add_plugins(plugins::player_movement::PlayerMovementPlugin);
