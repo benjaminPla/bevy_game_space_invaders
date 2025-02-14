@@ -1,6 +1,7 @@
 use crate::animations;
 use crate::plugins::resolution;
 use bevy::prelude::*;
+use std::time::Duration;
 
 #[derive(Component)]
 pub struct PlayerPlugin;
@@ -8,19 +9,61 @@ pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, setup_player);
-        app.add_systems(Update, player_movement);
     }
 }
 
+const SHOOT_DELAY: f32 = 0.5;
+
 #[derive(Component)]
 pub struct Player {
+    can_shoot: bool,
+    position: Vec2,
+    pub shoot_timer: Timer,
     speed: f32,
 }
 
 impl Player {
-    pub fn new() -> Self {
-        Self { speed: 200.0 }
-   }
+    pub fn new(resolution: &Res<resolution::Resolution>) -> Self {
+        Self {
+            can_shoot: true,
+            position: Vec2::new(0., (resolution.screen_dimensions.y / 3.5) * -1.),
+            shoot_timer: Timer::new(Duration::from_secs_f32(SHOOT_DELAY), TimerMode::Once),
+            speed: 200.0,
+        }
+    }
+
+    pub fn get_speed(&self) -> f32 {
+        self.speed
+    }
+
+    pub fn get_position(&self) -> Vec2 {
+        self.position
+    }
+
+    pub fn set_position_x(&mut self, new_position_x: f32) {
+        self.position.x = new_position_x;
+    }
+
+    pub fn get_can_shoot(&self) -> bool {
+        self.can_shoot
+    }
+
+    pub fn reset_shoot_time(&mut self) {
+        if self.can_shoot {
+            self.can_shoot = false;
+            self.shoot_timer.reset();
+        }
+    }
+
+    pub fn update_shoot_timer(&mut self, delta_time: f32) {
+        if !self.can_shoot {
+            self.shoot_timer.tick(Duration::from_secs_f32(delta_time));
+
+            if self.shoot_timer.finished() {
+                self.can_shoot = true;
+            }
+        }
+    }
 }
 
 fn setup_player(
@@ -47,36 +90,7 @@ fn setup_player(
         },
         Transform::from_xyz(0., (resolution.screen_dimensions.y / 3.5) * -1., 0.)
             .with_scale(Vec3::splat(resolution.pixel_ratio)),
-        Player::new(),
+        Player::new(&resolution),
         animation_config,
     ));
-}
-
-fn player_movement(
-    keys: Res<ButtonInput<KeyCode>>,
-    time: Res<Time>,
-    mut query: Query<(&mut Transform, &mut Player)>,
-    resolution: Res<resolution::Resolution>,
-) {
-    for (mut transform, player) in query.iter_mut() {
-        let boundary_x = resolution.screen_dimensions.x / 2.7;
-
-        let moving_left = keys.pressed(KeyCode::KeyA) || keys.pressed(KeyCode::ArrowLeft);
-        let moving_right = keys.pressed(KeyCode::KeyD) || keys.pressed(KeyCode::ArrowRight);
-
-        let mut movement_direction = 0.0;
-        if moving_left {
-            movement_direction = -1.0;
-        }
-        if moving_right {
-            movement_direction = 1.0;
-        }
-
-        let delta_move = movement_direction * player.speed * time.delta_secs();
-        let new_position_x = transform.translation.x + delta_move;
-
-        if new_position_x.abs() <= boundary_x {
-            transform.translation.x = new_position_x;
-        }
-    }
 }
