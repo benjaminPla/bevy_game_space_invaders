@@ -12,16 +12,14 @@ impl Plugin for PlayerShootingPlugin {
 }
 
 #[derive(Component)]
-struct Bullet {
+pub struct Bullet {
     position: Vec2,
-    speed: f32,
 }
 
 impl Bullet {
     fn new(player: &player::Player) -> Self {
         Self {
             position: Vec2::new(player.get_position().x, 0.),
-            speed: 200.0,
         }
     }
 }
