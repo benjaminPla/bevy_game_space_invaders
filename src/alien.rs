@@ -49,7 +49,7 @@ fn setup_alien(
                 },
                 Transform::from_translation(position)
                     .with_scale(Vec3::splat(resolution.pixel_ratio)),
-                alien_death::Collider::new(),
+                alien_death::Collider::default(),
                 Alien,
                 animation_config,
             ));

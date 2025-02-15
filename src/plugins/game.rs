@@ -16,6 +16,7 @@ impl Plugin for GamePlugin {
         app.add_plugins(plugins::player_movement::PlayerMovementPlugin);
         app.add_plugins(plugins::player_shooting::PlayerShootingPlugin);
         app.add_plugins(plugins::resolution::ResolutionPlugin);
+        app.add_plugins(plugins::store::StorePlugin);
         app.add_systems(Startup, setup_game);
         app.add_systems(Update, animations::execute_animations);
     }

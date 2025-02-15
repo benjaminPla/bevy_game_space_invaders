@@ -13,17 +13,7 @@ impl Plugin for PlayerShootingPlugin {
 }
 
 #[derive(Component)]
-pub struct Bullet {
-    position: Vec2,
-}
-
-impl Bullet {
-    fn new(player: &player::Player) -> Self {
-        Self {
-            position: Vec2::new(player.get_position().x, 0.),
-        }
-    }
-}
+pub struct Bullet;
 
 fn player_shooting(
     mut commands: Commands,
@@ -53,8 +43,8 @@ fn player_shooting(
                     0.,
                 )
                 .with_scale(Vec3::splat(resolution.pixel_ratio)),
-                alien_death::Collider::new(),
-                Bullet::new(&player),
+                alien_death::Collider::new(5., 5.),
+                Bullet,
             ));
             player.reset_shoot_time();
         }

@@ -5,3 +5,4 @@ pub mod game;
 pub mod player_movement;
 pub mod player_shooting;
 pub mod resolution;
+pub mod store;
