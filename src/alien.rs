@@ -36,7 +36,7 @@ fn setup_alien(
                 - (Vec3::Y * HEIGHT as f32 * SPACING * 1.5)
                 + (Vec3::Y * resolution.screen_dimensions.y * 0.5);
 
-            let animation_config = animations::AnimationConfig::new(0, 1, 5);
+            let animation_config = animations::AnimationConfig::new(0, 1, 4);
 
             commands.spawn((
                 Sprite {
