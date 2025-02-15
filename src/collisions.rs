@@ -1,11 +1,11 @@
-use crate::alien;
-use crate::plugins::player_shooting;
-use crate::plugins::store;
+use crate::enemy;
+use crate::game_state;
+use crate::projectiles;
 use bevy::prelude::*;
 
-pub struct AlienDeathPlugin;
+pub struct CollisionsPlugin;
 
-impl Plugin for AlienDeathPlugin {
+impl Plugin for CollisionsPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, collision_detection_system);
     }
@@ -32,12 +32,12 @@ impl Collider {
 
 fn collision_detection_system(
     mut commands: Commands,
-    query_bullet: Query<(Entity, &Transform, &player_shooting::Bullet, &Collider)>,
-    query_alien: Query<(Entity, &Transform, &alien::Alien, &Collider)>,
-    mut store: ResMut<store::Store>,
+    query_projectiles: Query<(Entity, &Transform, &projectiles::Projectile, &Collider)>,
+    query_enemies: Query<(Entity, &Transform, &enemy::Enemy, &Collider)>,
+    mut store: ResMut<game_state::GameState>,
 ) {
-    for (entity_bullet, bullet_transform, _bullet, bullet_collider) in query_bullet.iter() {
-        for (entity_alien, alien_transform, _alien, _alien_collider) in query_alien.iter() {
+    for (entity_bullet, bullet_transform, _bullet, bullet_collider) in query_projectiles.iter() {
+        for (entity_alien, alien_transform, _alien, _alien_collider) in query_enemies.iter() {
             let bullet_position = bullet_transform.translation.truncate();
             let alien_position = alien_transform.translation.truncate();
 

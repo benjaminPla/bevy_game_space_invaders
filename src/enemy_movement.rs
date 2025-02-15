@@ -1,40 +1,41 @@
-use crate::alien;
-use crate::plugins::resolution;
+use crate::enemy;
 use bevy::prelude::*;
 
-pub struct AlienMovementPlugin;
+pub struct EnemyMovementPlugin;
 
 #[derive(Resource)]
-struct AlienMovement {
+struct EnemyMovement {
     direction: f32,
     speed: f32,
 }
 
-impl Plugin for AlienMovementPlugin {
+impl Plugin for EnemyMovementPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, setup_alien_movement);
-        app.add_systems(Update, alien_movement);
+        app.add_systems(PreStartup, setup);
+        app.add_systems(Update, movement);
     }
 }
 
-fn setup_alien_movement(mut commands: Commands) {
-    commands.insert_resource(AlienMovement {
+fn setup(mut commands: Commands) {
+    commands.insert_resource(EnemyMovement {
         direction: 1.,
         speed: 200.,
     });
 }
 
-fn alien_movement(
-    mut query: Query<(&mut Transform, &alien::Alien)>,
-    mut alien_movement: ResMut<AlienMovement>,
+fn movement(
+    mut query: Query<(&mut Transform, &enemy::Enemy)>,
+    mut alien_movement: ResMut<EnemyMovement>,
     time: Res<Time>,
-    resolution: Res<resolution::Resolution>,
+    window_query: Query<&Window>,
 ) {
+    let window = window_query.single();
+
     let mut should_flip_direction = false;
     let mut should_go_down = false;
 
     for (transform, _alien) in query.iter() {
-        if transform.translation.x.abs() >= resolution.screen_dimensions.x / 2.7 {
+        if transform.translation.x.abs() >= window.width() / 2.7 {
             should_flip_direction = true;
             should_go_down = true;
             break;

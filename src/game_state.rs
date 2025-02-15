@@ -1,25 +1,25 @@
 use bevy::prelude::*;
 
-pub struct StorePlugin;
+pub struct GameStatePlugin;
 
-impl Plugin for StorePlugin {
+impl Plugin for GameStatePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(PreStartup, setup_store);
+        app.add_systems(PreStartup, setup);
         app.add_systems(Update, update_points_text);
     }
 }
 
 #[derive(Resource)]
-pub struct Store {
+pub struct GameState {
     points: u8,
-    enemies: (u8, u8),
+    // enemies: (u8, u8),
 }
 
-impl Store {
+impl GameState {
     fn new() -> Self {
         Self {
             points: 0,
-            enemies: (0, 0),
+            // enemies: (0, 0),
         }
     }
 
@@ -29,10 +29,10 @@ impl Store {
 }
 
 #[derive(Component)]
-struct GamePointsText;
+struct GameStatePointsText;
 
-fn setup_store(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.insert_resource(Store::new());
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands.insert_resource(GameState::new());
 
     let font = asset_server.load("fonts/font.ttf");
     let text_font = TextFont {
@@ -40,6 +40,7 @@ fn setup_store(mut commands: Commands, asset_server: Res<AssetServer>) {
         font_size: 16.,
         ..default()
     };
+
     commands
         .spawn((Node {
             position_type: PositionType::Absolute,
@@ -52,12 +53,15 @@ fn setup_store(mut commands: Commands, asset_server: Res<AssetServer>) {
                 TextSpan::default(),
                 Text::new("Points 0"),
                 text_font.clone(),
-                GamePointsText,
+                GameStatePointsText,
             ));
         });
 }
 
-fn update_points_text(mut query: Query<&mut Text, With<GamePointsText>>, store: Res<Store>) {
+fn update_points_text(
+    mut query: Query<&mut Text, With<GameStatePointsText>>,
+    store: Res<GameState>,
+) {
     for mut points_text in query.iter_mut() {
         points_text.0 = format!("Points {}", store.points);
     }

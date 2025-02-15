@@ -1,5 +1,4 @@
 use crate::player;
-use crate::plugins::resolution;
 use bevy::prelude::*;
 
 #[derive(Component)]
@@ -7,18 +6,20 @@ pub struct PlayerMovementPlugin;
 
 impl Plugin for PlayerMovementPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, player_movement);
+        app.add_systems(Update, movement);
     }
 }
 
-fn player_movement(
+fn movement(
     keys: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
     mut query: Query<(&mut Transform, &mut player::Player)>,
-    resolution: Res<resolution::Resolution>,
+    window_query: Query<&Window>,
 ) {
+    let window = window_query.single();
+
     for (mut transform, mut player) in query.iter_mut() {
-        let boundary_x = resolution.screen_dimensions.x / 2.7;
+        let boundary_x = window.width() / 2.7;
 
         let moving_left = keys.pressed(KeyCode::KeyA) || keys.pressed(KeyCode::ArrowLeft);
         let moving_right = keys.pressed(KeyCode::KeyD) || keys.pressed(KeyCode::ArrowRight);

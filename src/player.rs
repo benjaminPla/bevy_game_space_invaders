@@ -1,5 +1,4 @@
 use crate::animations;
-use crate::plugins::resolution;
 use bevy::prelude::*;
 use std::time::Duration;
 
@@ -8,7 +7,7 @@ pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, setup_player);
+        app.add_systems(Startup, setup);
     }
 }
 
@@ -23,10 +22,10 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(resolution: &Res<resolution::Resolution>) -> Self {
+    pub fn new(y: f32) -> Self {
         Self {
             can_shoot: true,
-            position: Vec2::new(0., (resolution.screen_dimensions.y / 3.5) * -1.),
+            position: Vec2::new(0., y),
             shoot_timer: Timer::new(Duration::from_secs_f32(SHOOT_DELAY), TimerMode::Once),
             speed: 200.0,
         }
@@ -66,12 +65,14 @@ impl Player {
     }
 }
 
-fn setup_player(
+fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
-    resolution: Res<resolution::Resolution>,
+    window_query: Query<&Window>,
 ) {
+    let window = window_query.single();
+
     let texture = asset_server.load("player.png");
 
     let layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 2, 1, None, None);
@@ -88,9 +89,8 @@ fn setup_player(
             }),
             ..default()
         },
-        Transform::from_xyz(0., (resolution.screen_dimensions.y / 3.5) * -1., 0.)
-            .with_scale(Vec3::splat(resolution.pixel_ratio)),
-        Player::new(&resolution),
+        Transform::from_xyz(0., window.height() / 3.5 * -1., 0.),
+        Player::new(window.width() / 3.5 * -1.),
         animation_config,
     ));
 }
