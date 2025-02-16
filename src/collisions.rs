@@ -34,7 +34,7 @@ fn collision_detection_system(
     mut commands: Commands,
     query_projectiles: Query<(Entity, &Transform, &projectiles::Projectile, &Collider)>,
     query_enemies: Query<(Entity, &Transform, &enemy::Enemy, &Collider)>,
-    mut store: ResMut<game_state::GameState>,
+    mut game_state: ResMut<game_state::GameState>,
 ) {
     for (projectile_entity, projectile_transform, _projectile, projectile_collider) in
         query_projectiles.iter()
@@ -51,7 +51,8 @@ fn collision_detection_system(
             if collision_x && collision_y {
                 commands.entity(projectile_entity).despawn();
                 commands.entity(entity_alien).despawn();
-                store.update_points();
+                game_state.update_points();
+                game_state.update_alive_enemies();
             }
         }
     }
