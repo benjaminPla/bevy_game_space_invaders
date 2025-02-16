@@ -40,7 +40,7 @@ fn spawn(
                 ..default()
             },
             Transform::from_xyz(player.get_position().x, window.height() / 3.5 * -1., 0.),
-            collisions::Collider::new(5., 5.),
+            collisions::Collider::new(5., 32.),
             Projectile,
         ));
         player.reset_shoot_time();

@@ -27,7 +27,7 @@ impl Player {
             can_shoot: true,
             position: Vec2::new(0., y),
             shoot_timer: Timer::new(Duration::from_secs_f32(SHOOT_DELAY), TimerMode::Once),
-            speed: 200.0,
+            speed: 500.0,
         }
     }
 

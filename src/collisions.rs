@@ -36,16 +36,20 @@ fn collision_detection_system(
     query_enemies: Query<(Entity, &Transform, &enemy::Enemy, &Collider)>,
     mut store: ResMut<game_state::GameState>,
 ) {
-    for (entity_bullet, bullet_transform, _bullet, bullet_collider) in query_projectiles.iter() {
-        for (entity_alien, alien_transform, _alien, _alien_collider) in query_enemies.iter() {
-            let bullet_position = bullet_transform.translation.truncate();
+    for (projectile_entity, projectile_transform, _projectile, projectile_collider) in
+        query_projectiles.iter()
+    {
+        for (entity_alien, alien_transform, _alien, alien_collider) in query_enemies.iter() {
+            let bullet_position = projectile_transform.translation.truncate();
             let alien_position = alien_transform.translation.truncate();
 
-            let distance_x = (bullet_position.x - alien_position.x).abs();
-            let distance_y = (bullet_position.y - alien_position.y).abs();
+            let collision_x = (bullet_position.x - alien_position.x).abs()
+                < (projectile_collider.width + alien_collider.width) * 0.5;
+            let collision_y = (bullet_position.y - alien_position.y).abs()
+                < (projectile_collider.height + alien_collider.height) * 0.5;
 
-            if distance_x < bullet_collider.width && distance_y < bullet_collider.height {
-                commands.entity(entity_bullet).despawn();
+            if collision_x && collision_y {
+                commands.entity(projectile_entity).despawn();
                 commands.entity(entity_alien).despawn();
                 store.update_points();
             }

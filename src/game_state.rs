@@ -11,20 +11,38 @@ impl Plugin for GameStatePlugin {
 
 #[derive(Resource)]
 pub struct GameState {
+    alive_enemies: u8,
     points: u8,
-    // enemies: (u8, u8),
+    total_enemies: u8,
 }
 
 impl GameState {
     fn new() -> Self {
+        let total_enemies = Self::get_enemies_for_level(1);
+
         Self {
+            alive_enemies: total_enemies,
             points: 0,
-            // enemies: (0, 0),
+            total_enemies,
         }
     }
 
     pub fn update_points(&mut self) {
         self.points += 1;
+    }
+
+    fn get_enemies_for_level(level: u8) -> u8 {
+        match level {
+            1 => 10,
+            2 => 15,
+            3 => 20,
+            4 => 25,
+            _ => 30,
+        }
+    }
+
+    pub fn get_total_enemies(&self) -> u8 {
+        self.total_enemies
     }
 }
 

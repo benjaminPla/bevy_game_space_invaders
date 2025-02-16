@@ -1,1 +1,2 @@
-pub const PROJECTILE_SPEED: f32 = 500.;
+pub const PROJECTILE_SPEED: f32 = 1000.;
+pub const ENEMIES_GAP: f32 = 50.;

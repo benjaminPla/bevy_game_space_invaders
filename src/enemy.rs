@@ -1,5 +1,7 @@
 use crate::animations;
 use crate::collisions;
+use crate::constants;
+use crate::game_state;
 use bevy::prelude::*;
 
 pub struct EnemyPlugin;
@@ -13,29 +15,36 @@ impl Plugin for EnemyPlugin {
 #[derive(Component)]
 pub struct Enemy;
 
-const WIDTH: i32 = 10;
-const HEIGHT: i32 = 5;
-const SPACING: f32 = 35.;
-
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
     window_query: Query<&Window>,
+    game_state: Res<game_state::GameState>,
 ) {
     let window = window_query.single();
-
     let texture = asset_server.load("alien.png");
 
     let layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 2, 1, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
 
-    for x in 0..WIDTH {
-        for y in 0..HEIGHT {
-            let position = Vec3::new(x as f32 * SPACING, y as f32 * SPACING, 0.)
-                - (Vec3::X * WIDTH as f32 * SPACING * 0.5)
-                - (Vec3::Y * HEIGHT as f32 * SPACING * 1.5)
-                + (Vec3::Y * window.height() * 0.5);
+    let total_enemies = game_state.get_total_enemies() as u32;
+    let mut enemies_spawned = 0;
+    let mut row = 0;
+    let mut enemies_in_row = (total_enemies as f32).sqrt().ceil() as u32;
+
+    while enemies_spawned < total_enemies {
+        let start_x = -(enemies_in_row as f32 * constants::ENEMIES_GAP * 0.5);
+        for i in 0..enemies_in_row {
+            if enemies_spawned >= total_enemies {
+                return;
+            }
+
+            let position = Vec3::new(
+                start_x + i as f32 * constants::ENEMIES_GAP,
+                window.height() * 0.5 - row as f32 * constants::ENEMIES_GAP - 100.0,
+                0.,
+            );
 
             let animation_config = animations::AnimationConfig::new(0, 1, 4);
 
@@ -53,6 +62,11 @@ fn setup(
                 Enemy,
                 animation_config,
             ));
+
+            enemies_spawned += 1;
         }
+
+        row += 1;
+        enemies_in_row -= 1;
     }
 }
