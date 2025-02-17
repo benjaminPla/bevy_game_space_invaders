@@ -1,5 +1,5 @@
 use crate::enemy;
-use crate::game_state;
+use crate::game;
 use crate::projectiles;
 use bevy::prelude::*;
 
@@ -34,7 +34,7 @@ fn collision_detection_system(
     mut commands: Commands,
     query_projectiles: Query<(Entity, &Transform, &projectiles::Projectile, &Collider)>,
     query_enemies: Query<(Entity, &Transform, &enemy::Enemy, &Collider)>,
-    mut game_state: ResMut<game_state::GameState>,
+    mut game: ResMut<game::Game>,
 ) {
     for (projectile_entity, projectile_transform, _projectile, projectile_collider) in
         query_projectiles.iter()
@@ -51,8 +51,8 @@ fn collision_detection_system(
             if collision_x && collision_y {
                 commands.entity(projectile_entity).despawn();
                 commands.entity(entity_alien).despawn();
-                game_state.update_points();
-                game_state.update_alive_enemies();
+                game.update_points();
+                game.update_alive_enemies();
             }
         }
     }

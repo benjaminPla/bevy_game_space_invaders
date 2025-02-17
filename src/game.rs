@@ -1,28 +1,37 @@
 use bevy::prelude::*;
 
-pub struct GameStatePlugin;
+pub struct GamePlugin;
 
-impl Plugin for GameStatePlugin {
+impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(PreStartup, setup);
         app.add_systems(Update, (update_points_text, update_enemies_text));
     }
 }
 
+enum GameState {
+    GameOver,
+    LevelWon,
+    Paused,
+    Playing,
+}
+
 #[derive(Resource)]
-pub struct GameState {
+pub struct Game {
     alive_enemies: u8,
     points: u8,
+    state: GameState,
     total_enemies: u8,
 }
 
-impl GameState {
+impl Game {
     fn new() -> Self {
         let total_enemies = Self::get_enemies_for_level(1);
 
         Self {
             alive_enemies: total_enemies,
             points: 0,
+            state: GameState::Playing,
             total_enemies,
         }
     }
@@ -33,11 +42,11 @@ impl GameState {
 
     fn get_enemies_for_level(level: u8) -> u8 {
         match level {
-            1 => 10,
-            2 => 15,
-            3 => 20,
-            4 => 25,
-            _ => 30,
+            1 => 20,
+            2 => 25,
+            3 => 30,
+            4 => 35,
+            _ => 40,
         }
     }
 
@@ -57,7 +66,7 @@ struct GameStatePointsText;
 struct GameStateEnemiesText;
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.insert_resource(GameState::new());
+    commands.insert_resource(Game::new());
 
     let font = asset_server.load("fonts/font.ttf");
     let text_font = TextFont {
@@ -109,20 +118,14 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         });
 }
 
-fn update_points_text(
-    mut query: Query<&mut Text, With<GameStatePointsText>>,
-    store: Res<GameState>,
-) {
+fn update_points_text(mut query: Query<&mut Text, With<GameStatePointsText>>, game: Res<Game>) {
     for mut text in query.iter_mut() {
-        text.0 = format!("{}", store.points);
+        text.0 = format!("{}", game.points);
     }
 }
 
-fn update_enemies_text(
-    mut query: Query<&mut Text, With<GameStateEnemiesText>>,
-    store: Res<GameState>,
-) {
+fn update_enemies_text(mut query: Query<&mut Text, With<GameStateEnemiesText>>, game: Res<Game>) {
     for mut text in query.iter_mut() {
-        text.0 = format!("{}/{}", store.alive_enemies, store.total_enemies);
+        text.0 = format!("{}/{}", game.alive_enemies, game.total_enemies);
     }
 }

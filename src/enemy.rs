@@ -1,7 +1,7 @@
 use crate::animations;
 use crate::collisions;
 use crate::constants;
-use crate::game_state;
+use crate::game;
 use bevy::prelude::*;
 
 pub struct EnemyPlugin;
@@ -20,7 +20,7 @@ fn setup(
     asset_server: Res<AssetServer>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
     window_query: Query<&Window>,
-    game_state: Res<game_state::GameState>,
+    game: Res<game::Game>,
 ) {
     let window = window_query.single();
     let texture = asset_server.load("alien.png");
@@ -28,7 +28,7 @@ fn setup(
     let layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 2, 1, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
 
-    let total_enemies = game_state.get_total_enemies() as u32;
+    let total_enemies = game.get_total_enemies() as u32;
 
     let mut enemies_spawned = 0;
     let mut row = 0;

@@ -3,7 +3,7 @@ mod collisions;
 mod constants;
 mod enemy;
 mod enemy_movement;
-mod game_state;
+mod game;
 mod player;
 mod player_movement;
 mod projectiles;
@@ -21,7 +21,7 @@ impl Plugin for MainPlugin {
         app.add_systems(Startup, setup).add_plugins((
             DefaultPlugins,
             collisions::CollisionsPlugin,
-            game_state::GameStatePlugin,
+            game::GamePlugin,
             player::PlayerPlugin,
             projectiles::ProjectilesPlugin,
             enemy::EnemyPlugin,
