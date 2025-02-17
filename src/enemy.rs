@@ -29,17 +29,20 @@ fn setup(
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
 
     let total_enemies = game_state.get_total_enemies() as u32;
+
     let mut enemies_spawned = 0;
     let mut row = 0;
-    let mut enemies_in_row = (total_enemies as f32).sqrt().ceil() as u32;
+    let mut enemies_in_row = 1;
+
+    while (enemies_in_row * (enemies_in_row + 1)) / 2 < total_enemies {
+        enemies_in_row += 1;
+    }
 
     while enemies_spawned < total_enemies {
         let start_x = -(enemies_in_row as f32 * constants::ENEMIES_GAP * 0.5);
-        for i in 0..enemies_in_row {
-            if enemies_spawned >= total_enemies {
-                return;
-            }
+        let row_enemies = enemies_in_row.min(total_enemies - enemies_spawned);
 
+        for i in 0..row_enemies {
             let position = Vec3::new(
                 start_x + i as f32 * constants::ENEMIES_GAP,
                 window.height() * 0.5 - row as f32 * constants::ENEMIES_GAP - 100.0,
