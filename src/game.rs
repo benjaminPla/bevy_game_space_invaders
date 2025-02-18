@@ -59,21 +59,16 @@ impl Game {
     pub fn update_alive_enemies(&mut self) {
         self.alive_enemies -= 1;
     }
-
-    pub fn get_state(&self) -> &GameState {
-        &self.state
-    }
-
-    pub fn update_state(&mut self, state: GameState) {
-        self.state = state;
-    }
 }
 
 #[derive(Component)]
-struct GameStatePointsText;
+struct PointsText;
 
 #[derive(Component)]
-struct GameStateEnemiesText;
+struct EnemiesText;
+
+#[derive(Component)]
+pub struct GameOverText;
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.insert_resource(Game::new());
@@ -82,6 +77,12 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let text_font = TextFont {
         font: font.clone(),
         font_size: 16.,
+        ..default()
+    };
+
+    let text_font_game_over = TextFont {
+        font: font.clone(),
+        font_size: 64.,
         ..default()
     };
 
@@ -102,7 +103,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                 TextSpan::default(),
                 Text::new("0"),
                 text_font.clone(),
-                GameStatePointsText,
+                PointsText,
             ));
         });
 
@@ -123,19 +124,25 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                 TextSpan::default(),
                 Text::new("0/0"),
                 text_font.clone(),
-                GameStateEnemiesText,
+                EnemiesText,
             ));
         });
+
+    commands.spawn((
+        Text2d::new("GAME OVER"),
+        text_font_game_over,
+        TextLayout::new_with_justify(JustifyText::Center),
+        GameOverText,
+        Visibility::Hidden,
+    ));
 }
 
-fn update_points_text(mut query: Query<&mut Text, With<GameStatePointsText>>, game: Res<Game>) {
-    for mut text in query.iter_mut() {
-        text.0 = format!("{}", game.points);
-    }
+fn update_points_text(mut query: Query<&mut Text, With<PointsText>>, game: Res<Game>) {
+    let mut text = query.single_mut();
+    text.0 = format!("{}", game.points);
 }
 
-fn update_enemies_text(mut query: Query<&mut Text, With<GameStateEnemiesText>>, game: Res<Game>) {
-    for mut text in query.iter_mut() {
-        text.0 = format!("{}/{}", game.alive_enemies, game.total_enemies);
-    }
+fn update_enemies_text(mut query: Query<&mut Text, With<EnemiesText>>, game: Res<Game>) {
+    let mut text = query.single_mut();
+    text.0 = format!("{}/{}", game.alive_enemies, game.total_enemies);
 }

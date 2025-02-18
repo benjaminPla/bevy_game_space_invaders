@@ -8,7 +8,10 @@ pub struct CollisionsPlugin;
 
 impl Plugin for CollisionsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (player_enemy, projectile_enemy));
+        app.add_systems(
+            Update,
+            (player_enemy, projectile_enemy).run_if(in_state(game::GameState::Playing)),
+        );
     }
 }
 
@@ -60,6 +63,7 @@ fn projectile_enemy(
 fn player_enemy(
     query_player: Query<(&Transform, &Collider), With<player::Player>>,
     query_enemies: Query<(&Transform, &Collider), With<enemy::Enemy>>,
+    mut query_game_over_text: Query<&mut Visibility, With<game::GameOverText>>,
     mut next_state: ResMut<NextState<game::GameState>>,
 ) {
     let (player_transform, player_collider) = query_player.single();
@@ -74,6 +78,9 @@ fn player_enemy(
 
         if collision_x && collision_y {
             next_state.set(game::GameState::GameOver);
+
+            let mut visibility = query_game_over_text.single_mut();
+            visibility.toggle_visible_hidden();
         }
     }
 }
