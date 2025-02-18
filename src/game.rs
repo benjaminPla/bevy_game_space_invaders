@@ -5,7 +5,10 @@ pub struct GamePlugin;
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(PreStartup, setup);
-        app.add_systems(Update, (update_points_text, update_enemies_text));
+        app.add_systems(
+            Update,
+            (check_game_won, update_points_text, update_enemies_text),
+        );
     }
 }
 
@@ -44,7 +47,7 @@ impl Game {
 
     fn get_enemies_for_level(level: u8) -> u8 {
         match level {
-            1 => 20,
+            1 => 1,
             2 => 25,
             3 => 30,
             4 => 35,
@@ -68,19 +71,22 @@ struct PointsText;
 struct EnemiesText;
 
 #[derive(Component)]
+pub struct LevelWonText;
+
+#[derive(Component)]
 pub struct GameOverText;
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.insert_resource(Game::new());
 
     let font = asset_server.load("fonts/font.ttf");
-    let text_font = TextFont {
+    let text_font_default = TextFont {
         font: font.clone(),
         font_size: 16.,
         ..default()
     };
 
-    let text_font_game_over = TextFont {
+    let text_font_big = TextFont {
         font: font.clone(),
         font_size: 64.,
         ..default()
@@ -97,12 +103,12 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             parent.spawn((
                 TextSpan::default(),
                 Text::new("Points: "),
-                text_font.clone(),
+                text_font_default.clone(),
             ));
             parent.spawn((
                 TextSpan::default(),
                 Text::new("0"),
-                text_font.clone(),
+                text_font_default.clone(),
                 PointsText,
             ));
         });
@@ -118,23 +124,67 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             parent.spawn((
                 TextSpan::default(),
                 Text::new("Enemies: "),
-                text_font.clone(),
+                text_font_default.clone(),
             ));
             parent.spawn((
                 TextSpan::default(),
                 Text::new("0/0"),
-                text_font.clone(),
+                text_font_default.clone(),
                 EnemiesText,
             ));
         });
 
     commands.spawn((
         Text2d::new("GAME OVER"),
-        text_font_game_over,
+        text_font_big.clone(),
         TextLayout::new_with_justify(JustifyText::Center),
         GameOverText,
         Visibility::Hidden,
     ));
+
+    commands
+        .spawn((Node {
+            display: Display::Flex,
+            align_items: AlignItems::Center,
+            flex_direction: FlexDirection::Column,
+            justify_content: JustifyContent::Center,
+            ..default()
+        },))
+        .with_children(|parent| {
+            parent.spawn((
+                LevelWonText,
+                Text2d::new("LEVEL COMPLETED!"),
+                text_font_big.clone(),
+                TextLayout::new_with_justify(JustifyText::Center),
+                TextSpan::default(),
+                Visibility::Hidden,
+            ));
+            parent.spawn((
+                LevelWonText,
+                Text2d::new("Press any key to continue to the next level"),
+                text_font_default.clone(),
+                TextLayout::new_with_justify(JustifyText::Center),
+                Node {
+                    margin: UiRect::bottom(Val::Px(50.)),
+                    ..default()
+                },
+                TextSpan::default(),
+                Visibility::Hidden,
+            ));
+        });
+}
+
+fn check_game_won(
+    game: Res<Game>,
+    mut next_state: ResMut<NextState<GameState>>,
+    mut query_text_level_won: Query<&mut Visibility, With<LevelWonText>>,
+) {
+    if game.alive_enemies == 0 {
+        next_state.set(GameState::GameOver);
+        for mut text in query_text_level_won.iter_mut() {
+            text.toggle_visible_hidden();
+        }
+    }
 }
 
 fn update_points_text(mut query: Query<&mut Text, With<PointsText>>, game: Res<Game>) {
