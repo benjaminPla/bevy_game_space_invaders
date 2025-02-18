@@ -9,7 +9,7 @@ pub struct ProjectilesPlugin;
 
 impl Plugin for ProjectilesPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, despawn).add_systems(
+        app.add_systems(
             Update,
             (movement, spawn).run_if(in_state(game::GameState::Playing)),
         );
@@ -48,19 +48,6 @@ fn spawn(
             Projectile,
         ));
         player.reset_shoot_time();
-    }
-}
-
-fn despawn(
-    mut commands: Commands,
-    query: Query<(Entity, &Transform), With<Projectile>>,
-    window_query: Query<&Window>,
-) {
-    let window = window_query.single();
-    for (entity, transform) in query.iter() {
-        if transform.translation.y > window.height() * 0.5 {
-            commands.entity(entity).despawn();
-        }
     }
 }
 

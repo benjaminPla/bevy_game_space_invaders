@@ -7,7 +7,12 @@ impl Plugin for GamePlugin {
         app.add_systems(PreStartup, setup);
         app.add_systems(
             Update,
-            (check_game_won, update_points_text, update_enemies_text),
+            (
+                check_game_lost,
+                check_game_won,
+                update_points_text,
+                update_enemies_text,
+            ),
         );
     }
 }
@@ -16,7 +21,7 @@ impl Plugin for GamePlugin {
 pub enum GameState {
     GameOver,
     LevelWon,
-    Paused,
+    // Paused,
     #[default]
     Playing,
 }
@@ -47,7 +52,7 @@ impl Game {
 
     fn get_enemies_for_level(level: u8) -> u8 {
         match level {
-            1 => 1,
+            1 => 20,
             2 => 25,
             3 => 30,
             4 => 35,
@@ -180,10 +185,20 @@ fn check_game_won(
     mut query_text_level_won: Query<&mut Visibility, With<LevelWonText>>,
 ) {
     if game.alive_enemies == 0 {
-        next_state.set(GameState::GameOver);
+        next_state.set(GameState::LevelWon);
         for mut text in query_text_level_won.iter_mut() {
             text.toggle_visible_hidden();
         }
+    }
+}
+
+fn check_game_lost(
+    state: Res<State<GameState>>,
+    mut query_game_over_text: Query<&mut Visibility, With<GameOverText>>,
+) {
+    if *state.get() == GameState::GameOver {
+        let mut text = query_game_over_text.single_mut();
+        text.toggle_visible_hidden();
     }
 }
 

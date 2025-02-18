@@ -10,8 +10,10 @@ impl Plugin for CollisionsPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (player_enemy, projectile_enemy).run_if(in_state(game::GameState::Playing)),
-        );
+            (player_enemy, enemy_boundary, projectile_enemy)
+                .run_if(in_state(game::GameState::Playing)),
+        )
+        .add_systems(Update, projectile_boundary);
     }
 }
 
@@ -60,10 +62,35 @@ fn projectile_enemy(
     }
 }
 
+fn projectile_boundary(
+    mut commands: Commands,
+    query: Query<(Entity, &Transform), With<projectiles::Projectile>>,
+    window_query: Query<&Window>,
+) {
+    let window = window_query.single();
+    for (entity, transform) in query.iter() {
+        if transform.translation.y > window.height() * 0.5 {
+            commands.entity(entity).despawn();
+        }
+    }
+}
+
+fn enemy_boundary(
+    query: Query<&Transform, With<enemy::Enemy>>,
+    window_query: Query<&Window>,
+    mut next_state: ResMut<NextState<game::GameState>>,
+) {
+    let window = window_query.single();
+    for transform in query.iter() {
+        if transform.translation.y <= -window.height() * 0.5 {
+            next_state.set(game::GameState::GameOver);
+        }
+    }
+}
+
 fn player_enemy(
     query_player: Query<(&Transform, &Collider), With<player::Player>>,
     query_enemies: Query<(&Transform, &Collider), With<enemy::Enemy>>,
-    mut query_game_over_text: Query<&mut Visibility, With<game::GameOverText>>,
     mut next_state: ResMut<NextState<game::GameState>>,
 ) {
     let (player_transform, player_collider) = query_player.single();
@@ -78,9 +105,6 @@ fn player_enemy(
 
         if collision_x && collision_y {
             next_state.set(game::GameState::GameOver);
-
-            let mut visibility = query_game_over_text.single_mut();
-            visibility.toggle_visible_hidden();
         }
     }
 }
