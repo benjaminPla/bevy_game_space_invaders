@@ -9,10 +9,12 @@ impl Plugin for GamePlugin {
     }
 }
 
-enum GameState {
+#[derive(States, Debug, Clone, Copy, Eq, PartialEq, Hash, Default)]
+pub enum GameState {
     GameOver,
     LevelWon,
     Paused,
+    #[default]
     Playing,
 }
 
@@ -56,6 +58,14 @@ impl Game {
 
     pub fn update_alive_enemies(&mut self) {
         self.alive_enemies -= 1;
+    }
+
+    pub fn get_state(&self) -> &GameState {
+        &self.state
+    }
+
+    pub fn update_state(&mut self, state: GameState) {
+        self.state = state;
     }
 }
 

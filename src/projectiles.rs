@@ -1,5 +1,6 @@
 use crate::collisions;
 use crate::constants;
+use crate::game;
 use crate::player;
 use bevy::prelude::*;
 
@@ -8,7 +9,10 @@ pub struct ProjectilesPlugin;
 
 impl Plugin for ProjectilesPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (despawn, movement, spawn));
+        app.add_systems(Update, despawn).add_systems(
+            Update,
+            (movement, spawn).run_if(in_state(game::GameState::Playing)),
+        );
     }
 }
 
@@ -16,15 +20,15 @@ impl Plugin for ProjectilesPlugin {
 pub struct Projectile;
 
 fn spawn(
-    mut commands: Commands,
     asset_server: Res<AssetServer>,
     keys: Res<ButtonInput<KeyCode>>,
     mouse: Res<ButtonInput<MouseButton>>,
+    mut commands: Commands,
+    mut query_player: Query<&mut player::Player>,
     time: Res<Time>,
-    mut player_query: Query<&mut player::Player>,
     window_query: Query<&Window>,
 ) {
-    let mut player = player_query.single_mut();
+    let mut player = query_player.single_mut();
     let window = window_query.single();
 
     player.update_shoot_timer(time.delta_secs());

@@ -49,7 +49,7 @@ fn setup(
                 0.,
             );
 
-            let animation_config = animations::AnimationConfig::new(0, 1, 4);
+            let animation_config = animations::Animations::new(0, 1, 4);
 
             commands.spawn((
                 Sprite {

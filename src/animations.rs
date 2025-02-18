@@ -1,15 +1,28 @@
+use crate::game;
 use bevy::prelude::*;
 use std::time::Duration;
 
 #[derive(Component)]
-pub struct AnimationConfig {
+pub struct AnimationPlugin;
+
+impl Plugin for AnimationPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(
+            Update,
+            animations.run_if(in_state(game::GameState::Playing)),
+        );
+    }
+}
+
+#[derive(Component)]
+pub struct Animations {
     first_sprite_index: usize,
     last_sprite_index: usize,
     fps: u8,
     frame_timer: Timer,
 }
 
-impl AnimationConfig {
+impl Animations {
     pub fn new(first: usize, last: usize, fps: u8) -> Self {
         Self {
             first_sprite_index: first,
@@ -31,7 +44,7 @@ impl AnimationConfig {
     }
 }
 
-pub fn execute_animations(time: Res<Time>, mut query: Query<(&mut AnimationConfig, &mut Sprite)>) {
+fn animations(time: Res<Time>, mut query: Query<(&mut Animations, &mut Sprite)>) {
     for (mut config, mut sprite) in &mut query {
         config.frame_timer.tick(time.delta());
 
@@ -41,7 +54,7 @@ pub fn execute_animations(time: Res<Time>, mut query: Query<(&mut AnimationConfi
                     atlas.index = config.first_sprite_index;
                 } else {
                     atlas.index += 1;
-                    config.frame_timer = AnimationConfig::timer_from_fps(config.fps);
+                    config.frame_timer = Animations::timer_from_fps(config.fps);
                 }
             }
             config.frame_timer.reset();

@@ -1,4 +1,5 @@
 use crate::animations;
+use crate::collisions;
 use bevy::prelude::*;
 use std::time::Duration;
 
@@ -78,7 +79,7 @@ fn setup(
     let layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 2, 1, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
 
-    let animation_config = animations::AnimationConfig::new(0, 1, 2);
+    let animation_config = animations::Animations::new(0, 1, 2);
 
     commands.spawn((
         Sprite {
@@ -89,6 +90,7 @@ fn setup(
             }),
             ..default()
         },
+        collisions::Collider::default(),
         Transform::from_xyz(0., window.height() / 3.5 * -1., 0.),
         Player::new(window.width() / 3.5 * -1.),
         animation_config,

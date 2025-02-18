@@ -1,10 +1,11 @@
 use crate::enemy;
+use crate::game;
 use bevy::prelude::*;
 
 pub struct EnemyMovementPlugin;
 
 #[derive(Resource)]
-struct EnemyMovement {
+pub struct EnemyMovement {
     direction: f32,
     speed: f32,
 }
@@ -12,7 +13,7 @@ struct EnemyMovement {
 impl Plugin for EnemyMovementPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(PreStartup, setup);
-        app.add_systems(Update, movement);
+        app.add_systems(Update, movement.run_if(in_state(game::GameState::Playing)));
     }
 }
 
@@ -24,8 +25,8 @@ fn setup(mut commands: Commands) {
 }
 
 fn movement(
-    mut query: Query<(&mut Transform, &enemy::Enemy)>,
     mut alien_movement: ResMut<EnemyMovement>,
+    mut query: Query<(&mut Transform, &enemy::Enemy)>,
     time: Res<Time>,
     window_query: Query<&Window>,
 ) {

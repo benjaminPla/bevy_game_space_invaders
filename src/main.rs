@@ -18,17 +18,19 @@ pub struct MainPlugin;
 
 impl Plugin for MainPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, setup).add_plugins((
-            DefaultPlugins,
-            collisions::CollisionsPlugin,
-            game::GamePlugin,
-            player::PlayerPlugin,
-            projectiles::ProjectilesPlugin,
-            enemy::EnemyPlugin,
-            enemy_movement::EnemyMovementPlugin,
-            player_movement::PlayerMovementPlugin,
-        ));
-        app.add_systems(Update, animations::execute_animations);
+        app.add_plugins(DefaultPlugins)
+            .init_state::<game::GameState>()
+            .add_systems(Startup, setup)
+            .add_plugins((
+                animations::AnimationPlugin,
+                collisions::CollisionsPlugin,
+                game::GamePlugin,
+                player::PlayerPlugin,
+                projectiles::ProjectilesPlugin,
+                enemy::EnemyPlugin,
+                enemy_movement::EnemyMovementPlugin,
+                player_movement::PlayerMovementPlugin,
+            ));
     }
 }
 

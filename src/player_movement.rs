@@ -1,3 +1,4 @@
+use crate::game;
 use crate::player;
 use bevy::prelude::*;
 
@@ -6,7 +7,7 @@ pub struct PlayerMovementPlugin;
 
 impl Plugin for PlayerMovementPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, movement);
+        app.add_systems(Update, movement.run_if(in_state(game::GameState::Playing)));
     }
 }
 
