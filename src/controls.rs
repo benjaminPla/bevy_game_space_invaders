@@ -10,7 +10,11 @@ impl Plugin for ControlsPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (pause, player_movement, shoot).run_if(in_state(game::GameState::Playing)),
+            (player_movement, shoot).run_if(in_state(game::GameState::Playing)),
+        )
+        .add_systems(
+            Update,
+            pause.run_if(in_state(game::GameState::Playing).or(in_state(game::GameState::Paused))),
         );
     }
 }

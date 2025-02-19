@@ -15,7 +15,7 @@ impl Plugin for EnemyPlugin {
 #[derive(Component)]
 pub struct Enemy;
 
-fn setup(
+pub fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,

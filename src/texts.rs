@@ -5,8 +5,17 @@ pub struct TextsPlugin;
 
 impl Plugin for TextsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(PreStartup, setup);
-        app.add_systems(Update, (game_over, pause, level_completed, points, enemies));
+        app.add_systems(PreStartup, setup)
+            .add_systems(Update, (points, enemies))
+            .add_systems(
+                Update,
+                game_over.run_if(in_state(game::GameState::GameOver)),
+            )
+            .add_systems(Update, pause.run_if(in_state(game::GameState::Paused)))
+            .add_systems(
+                Update,
+                level_completed.run_if(in_state(game::GameState::LevelCompleted)),
+            );
     }
 }
 
@@ -118,7 +127,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             ));
             parent.spawn((
                 LevelCompleted,
-                Text2d::new("Press any key to continue to the next level"),
+                Text2d::new("Press space key to continue to the next level"),
                 text_font_default.clone(),
                 TextLayout::new_with_justify(JustifyText::Center),
                 Node {
