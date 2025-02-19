@@ -5,8 +5,9 @@ mod enemy;
 mod enemy_movement;
 mod game;
 mod player;
-mod player_movement;
+mod controls;
 mod projectiles;
+mod texts;
 
 use bevy::prelude::*;
 
@@ -24,12 +25,13 @@ impl Plugin for MainPlugin {
             .add_plugins((
                 animations::AnimationPlugin,
                 collisions::CollisionsPlugin,
+                controls::ControlsPlugin,
+                enemy::EnemyPlugin,
+                enemy_movement::EnemyMovementPlugin,
                 game::GamePlugin,
                 player::PlayerPlugin,
                 projectiles::ProjectilesPlugin,
-                enemy::EnemyPlugin,
-                enemy_movement::EnemyMovementPlugin,
-                player_movement::PlayerMovementPlugin,
+                texts::TextsPlugin,
             ));
     }
 }

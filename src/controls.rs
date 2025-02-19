@@ -2,16 +2,18 @@ use crate::game;
 use crate::player;
 use bevy::prelude::*;
 
-#[derive(Component)]
-pub struct PlayerMovementPlugin;
+pub struct ControlsPlugin;
 
-impl Plugin for PlayerMovementPlugin {
+impl Plugin for ControlsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, movement.run_if(in_state(game::GameState::Playing)));
+        app.add_systems(
+            Update,
+            (pause, player_movement).run_if(in_state(game::GameState::Playing)),
+        );
     }
 }
 
-fn movement(
+fn player_movement(
     keys: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
     mut query: Query<(&mut Transform, &mut player::Player)>,
@@ -39,6 +41,20 @@ fn movement(
         if new_position_x.abs() <= boundary_x {
             transform.translation.x = new_position_x;
             player.set_position_x(new_position_x);
+        }
+    }
+}
+
+fn pause(
+    state: Res<State<game::GameState>>,
+    mut next_state: ResMut<NextState<game::GameState>>,
+    keys: Res<ButtonInput<KeyCode>>,
+) {
+    if keys.just_pressed(KeyCode::KeyP) {
+        match state.get() {
+            game::GameState::Playing => next_state.set(game::GameState::Paused),
+            game::GameState::Paused => next_state.set(game::GameState::Playing),
+            _ => {}
         }
     }
 }

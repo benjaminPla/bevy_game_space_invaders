@@ -5,23 +5,15 @@ pub struct GamePlugin;
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(PreStartup, setup);
-        app.add_systems(
-            Update,
-            (
-                check_game_lost,
-                check_game_won,
-                update_points_text,
-                update_enemies_text,
-            ),
-        );
+        app.add_systems(Update, (level_cmpleted,));
     }
 }
 
 #[derive(States, Debug, Clone, Copy, Eq, PartialEq, Hash, Default)]
 pub enum GameState {
     GameOver,
-    LevelWon,
-    // Paused,
+    LevelCompleted,
+    Paused,
     #[default]
     Playing,
 }
@@ -30,18 +22,15 @@ pub enum GameState {
 pub struct Game {
     alive_enemies: u8,
     points: u8,
-    state: GameState,
     total_enemies: u8,
 }
 
 impl Game {
     fn new() -> Self {
         let total_enemies = Self::get_enemies_for_level(1);
-
         Self {
             alive_enemies: total_enemies,
             points: 0,
-            state: GameState::Playing,
             total_enemies,
         }
     }
@@ -67,147 +56,22 @@ impl Game {
     pub fn update_alive_enemies(&mut self) {
         self.alive_enemies -= 1;
     }
+
+    pub fn get_points(&self) -> u8 {
+        self.points
+    }
+
+    pub fn get_alive_enemies(&self) -> u8 {
+        self.alive_enemies
+    }
 }
 
-#[derive(Component)]
-struct PointsText;
-
-#[derive(Component)]
-struct EnemiesText;
-
-#[derive(Component)]
-pub struct LevelWonText;
-
-#[derive(Component)]
-pub struct GameOverText;
-
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn setup(mut commands: Commands) {
     commands.insert_resource(Game::new());
-
-    let font = asset_server.load("fonts/font.ttf");
-    let text_font_default = TextFont {
-        font: font.clone(),
-        font_size: 16.,
-        ..default()
-    };
-
-    let text_font_big = TextFont {
-        font: font.clone(),
-        font_size: 64.,
-        ..default()
-    };
-
-    commands
-        .spawn((Node {
-            position_type: PositionType::Absolute,
-            top: Val::Px(8.),
-            left: Val::Px(8.),
-            ..default()
-        },))
-        .with_children(|parent| {
-            parent.spawn((
-                TextSpan::default(),
-                Text::new("Points: "),
-                text_font_default.clone(),
-            ));
-            parent.spawn((
-                TextSpan::default(),
-                Text::new("0"),
-                text_font_default.clone(),
-                PointsText,
-            ));
-        });
-
-    commands
-        .spawn((Node {
-            position_type: PositionType::Absolute,
-            top: Val::Px(24.),
-            left: Val::Px(9.),
-            ..default()
-        },))
-        .with_children(|parent| {
-            parent.spawn((
-                TextSpan::default(),
-                Text::new("Enemies: "),
-                text_font_default.clone(),
-            ));
-            parent.spawn((
-                TextSpan::default(),
-                Text::new("0/0"),
-                text_font_default.clone(),
-                EnemiesText,
-            ));
-        });
-
-    commands.spawn((
-        Text2d::new("GAME OVER"),
-        text_font_big.clone(),
-        TextLayout::new_with_justify(JustifyText::Center),
-        GameOverText,
-        Visibility::Hidden,
-    ));
-
-    commands
-        .spawn((Node {
-            display: Display::Flex,
-            align_items: AlignItems::Center,
-            flex_direction: FlexDirection::Column,
-            justify_content: JustifyContent::Center,
-            ..default()
-        },))
-        .with_children(|parent| {
-            parent.spawn((
-                LevelWonText,
-                Text2d::new("LEVEL COMPLETED!"),
-                text_font_big.clone(),
-                TextLayout::new_with_justify(JustifyText::Center),
-                TextSpan::default(),
-                Visibility::Hidden,
-            ));
-            parent.spawn((
-                LevelWonText,
-                Text2d::new("Press any key to continue to the next level"),
-                text_font_default.clone(),
-                TextLayout::new_with_justify(JustifyText::Center),
-                Node {
-                    margin: UiRect::bottom(Val::Px(50.)),
-                    ..default()
-                },
-                TextSpan::default(),
-                Visibility::Hidden,
-            ));
-        });
 }
 
-fn check_game_won(
-    game: Res<Game>,
-    mut next_state: ResMut<NextState<GameState>>,
-    mut query_text_level_won: Query<&mut Visibility, With<LevelWonText>>,
-) {
+fn level_cmpleted(game: Res<Game>, mut next_state: ResMut<NextState<GameState>>) {
     if game.alive_enemies == 0 {
-        next_state.set(GameState::LevelWon);
-        for mut text in query_text_level_won.iter_mut() {
-            text.toggle_visible_hidden();
-        }
+        next_state.set(GameState::LevelCompleted);
     }
-}
-
-fn check_game_lost(
-    state: Res<State<GameState>>,
-    mut query_game_over_text: Query<&mut Visibility, With<GameOverText>>,
-) {
-    if *state.get() == GameState::GameOver {
-        let mut text = query_game_over_text.single_mut();
-        text.toggle_visible_hidden();
-    }
-}
-
-fn update_points_text(mut query: Query<&mut Text, With<PointsText>>, game: Res<Game>) {
-    let mut text = query.single_mut();
-    text.0 = format!("{}", game.points);
-}
-
-fn update_enemies_text(mut query: Query<&mut Text, With<EnemiesText>>, game: Res<Game>) {
-    let mut text = query.single_mut();
-    text.0 = format!("{}/{}", game.alive_enemies, game.total_enemies);
 }
