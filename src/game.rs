@@ -1,4 +1,5 @@
 use crate::enemy;
+use crate::texts;
 use bevy::prelude::*;
 
 pub struct GamePlugin;
@@ -98,7 +99,8 @@ impl Game {
     fn get_next_level(&self) -> Option<Level> {
         match self.level {
             Level::One => Some(Level::Two),
-            Level::Two => Some(Level::Three),
+            // Level::Two => Some(Level::Three),
+            Level::Two => None,
             Level::Three => Some(Level::Four),
             Level::Four => Some(Level::Five),
             Level::Five => None,
@@ -114,11 +116,16 @@ fn setup(mut commands: Commands) {
     commands.insert_resource(Game::new());
 }
 
-fn level_completed(mut game: ResMut<Game>, mut next_state: ResMut<NextState<GameState>>) {
+fn level_completed(
+    mut game: ResMut<Game>,
+    mut next_state: ResMut<NextState<GameState>>,
+    mut text_events: EventWriter<texts::TextEvents>,
+) {
     if game.alive_enemies == 0 {
-        next_state.set(GameState::LevelCompleted);
         match game.get_next_level() {
             Some(next_level) => {
+                text_events.send(texts::TextEvents::LevelCompleted);
+                next_state.set(GameState::LevelCompleted);
                 let next_enemies = Game::get_enemies_for_level(&next_level);
                 game.set_next_level(next_level);
                 game.set_alive_enemies(next_enemies);
@@ -137,6 +144,7 @@ fn jump_to_next_lvl(
     game: Res<Game>,
     keys: Res<ButtonInput<KeyCode>>,
     mut next_state: ResMut<NextState<GameState>>,
+    mut text_events: EventWriter<texts::TextEvents>,
 ) {
     if keys.just_pressed(KeyCode::Space) {
         enemy::setup(
@@ -147,5 +155,6 @@ fn jump_to_next_lvl(
             game,
         );
         next_state.set(GameState::Playing);
+        text_events.send(texts::TextEvents::Clear);
     }
 }
