@@ -131,7 +131,10 @@ fn level_completed(
                 game.set_alive_enemies(next_enemies);
                 game.set_total_enemies(next_enemies);
             }
-            None => next_state.set(GameState::GameCompleted),
+            None => {
+                text_events.send(texts::TextEvents::GameCompleted);
+                next_state.set(GameState::GameCompleted);
+            }
         };
     }
 }

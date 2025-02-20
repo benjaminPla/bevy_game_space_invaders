@@ -2,6 +2,7 @@ use crate::collisions;
 use crate::game;
 use crate::player;
 use crate::projectiles;
+use crate::texts;
 use bevy::prelude::*;
 
 pub struct ControlsPlugin;
@@ -52,14 +53,21 @@ fn player_movement(
 }
 
 fn pause(
-    state: Res<State<game::GameState>>,
-    mut next_state: ResMut<NextState<game::GameState>>,
     keys: Res<ButtonInput<KeyCode>>,
+    mut next_state: ResMut<NextState<game::GameState>>,
+    mut text_events: EventWriter<texts::TextEvents>,
+    state: Res<State<game::GameState>>,
 ) {
     if keys.just_pressed(KeyCode::KeyP) {
         match state.get() {
-            game::GameState::Playing => next_state.set(game::GameState::Paused),
-            game::GameState::Paused => next_state.set(game::GameState::Playing),
+            game::GameState::Playing => {
+                next_state.set(game::GameState::Paused);
+                text_events.send(texts::TextEvents::Paused);
+            }
+            game::GameState::Paused => {
+                next_state.set(game::GameState::Playing);
+                text_events.send(texts::TextEvents::Clear);
+            }
             _ => {}
         }
     }

@@ -2,6 +2,7 @@ use crate::enemy;
 use crate::game;
 use crate::player;
 use crate::projectiles;
+use crate::texts;
 use bevy::prelude::*;
 
 pub struct CollisionsPlugin;
@@ -79,10 +80,12 @@ fn enemy_boundary(
     query: Query<&Transform, With<enemy::Enemy>>,
     window_query: Query<&Window>,
     mut next_state: ResMut<NextState<game::GameState>>,
+    mut text_events: EventWriter<texts::TextEvents>,
 ) {
     let window = window_query.single();
     for transform in query.iter() {
         if transform.translation.y <= -window.height() * 0.5 {
+            text_events.send(texts::TextEvents::GameOver);
             next_state.set(game::GameState::GameOver);
         }
     }
@@ -92,6 +95,7 @@ fn player_enemy(
     query_player: Query<(&Transform, &Collider), With<player::Player>>,
     query_enemies: Query<(&Transform, &Collider), With<enemy::Enemy>>,
     mut next_state: ResMut<NextState<game::GameState>>,
+    mut text_events: EventWriter<texts::TextEvents>,
 ) {
     let (player_transform, player_collider) = query_player.single();
     for (enemy_transform, enemy_collider) in query_enemies.iter() {
@@ -104,6 +108,7 @@ fn player_enemy(
             < (player_collider.height + enemy_collider.height) * 0.5;
 
         if collision_x && collision_y {
+            text_events.send(texts::TextEvents::GameOver);
             next_state.set(game::GameState::GameOver);
         }
     }
