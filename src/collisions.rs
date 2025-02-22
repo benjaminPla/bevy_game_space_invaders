@@ -2,6 +2,7 @@ use crate::enemy;
 use crate::game;
 use crate::player;
 use crate::projectiles;
+use crate::sound;
 use crate::texts;
 use bevy::prelude::*;
 
@@ -39,9 +40,10 @@ impl Collider {
 
 fn projectile_enemy(
     mut commands: Commands,
-    query_projectiles: Query<(Entity, &Transform, &Collider), With<projectiles::Projectile>>,
-    query_enemies: Query<(Entity, &Transform, &Collider), With<enemy::Enemy>>,
     mut game: ResMut<game::Game>,
+    mut sound_events: EventWriter<sound::SoundEvents>,
+    query_enemies: Query<(Entity, &Transform, &Collider), With<enemy::Enemy>>,
+    query_projectiles: Query<(Entity, &Transform, &Collider), With<projectiles::Projectile>>,
 ) {
     for (projectile_entity, projectile_transform, projectile_collider) in query_projectiles.iter() {
         for (enemy_entity, enemy_transform, enemy_collider) in query_enemies.iter() {
@@ -54,6 +56,7 @@ fn projectile_enemy(
                 < (projectile_collider.height + enemy_collider.height) * 0.5;
 
             if collision_x && collision_y {
+                sound_events.send(sound::SoundEvents::Explosion);
                 commands.entity(projectile_entity).despawn();
                 commands.entity(enemy_entity).despawn();
                 game.update_points();
@@ -77,14 +80,16 @@ fn projectile_boundary(
 }
 
 fn enemy_boundary(
+    mut next_state: ResMut<NextState<game::GameState>>,
+    mut sound_events: EventWriter<sound::SoundEvents>,
+    mut text_events: EventWriter<texts::TextEvents>,
     query: Query<&Transform, With<enemy::Enemy>>,
     window_query: Query<&Window>,
-    mut next_state: ResMut<NextState<game::GameState>>,
-    mut text_events: EventWriter<texts::TextEvents>,
 ) {
     let window = window_query.single();
     for transform in query.iter() {
         if transform.translation.y <= -window.height() * 0.5 {
+            sound_events.send(sound::SoundEvents::GameOver);
             text_events.send(texts::TextEvents::GameOver);
             next_state.set(game::GameState::GameOver);
         }
@@ -92,10 +97,11 @@ fn enemy_boundary(
 }
 
 fn player_enemy(
-    query_player: Query<(&Transform, &Collider), With<player::Player>>,
-    query_enemies: Query<(&Transform, &Collider), With<enemy::Enemy>>,
     mut next_state: ResMut<NextState<game::GameState>>,
+    mut sound_events: EventWriter<sound::SoundEvents>,
     mut text_events: EventWriter<texts::TextEvents>,
+    query_enemies: Query<(&Transform, &Collider), With<enemy::Enemy>>,
+    query_player: Query<(&Transform, &Collider), With<player::Player>>,
 ) {
     let (player_transform, player_collider) = query_player.single();
     for (enemy_transform, enemy_collider) in query_enemies.iter() {
@@ -108,6 +114,7 @@ fn player_enemy(
             < (player_collider.height + enemy_collider.height) * 0.5;
 
         if collision_x && collision_y {
+            sound_events.send(sound::SoundEvents::GameOver);
             text_events.send(texts::TextEvents::GameOver);
             next_state.set(game::GameState::GameOver);
         }

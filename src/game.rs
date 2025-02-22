@@ -1,4 +1,5 @@
 use crate::enemy;
+use crate::sound;
 use crate::texts;
 use bevy::prelude::*;
 
@@ -113,6 +114,7 @@ fn setup(mut commands: Commands) {
 fn level_completed(
     mut game: ResMut<Game>,
     mut next_state: ResMut<NextState<GameState>>,
+    mut sound_events: EventWriter<sound::SoundEvents>,
     mut text_events: EventWriter<texts::TextEvents>,
 ) {
     if game.alive_enemies == 0 {
@@ -126,6 +128,7 @@ fn level_completed(
                 game.set_total_enemies(next_enemies);
             }
             None => {
+                sound_events.send(sound::SoundEvents::LevelCompleted);
                 text_events.send(texts::TextEvents::GameCompleted);
                 next_state.set(GameState::GameCompleted);
             }
