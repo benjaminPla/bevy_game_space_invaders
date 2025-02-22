@@ -7,3 +7,4 @@
 - add html + serve
 - add collision events
 - improve planet spite, update bg sprites to be col:2 row:1
+- create _assets/sprites_

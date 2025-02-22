@@ -1,4 +1,5 @@
 mod animations;
+mod sound;
 mod background;
 mod collisions;
 mod constants;
@@ -25,6 +26,7 @@ impl Plugin for MainPlugin {
             .add_systems(Startup, setup)
             .add_plugins((
                 animations::AnimationPlugin,
+                sound::SoundPlugin,
                 background::BackgroundPlugin,
                 collisions::CollisionsPlugin,
                 controls::ControlsPlugin,

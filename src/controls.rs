@@ -2,6 +2,7 @@ use crate::collisions;
 use crate::game;
 use crate::player;
 use crate::projectiles;
+use crate::sound;
 use crate::texts;
 use bevy::prelude::*;
 
@@ -79,6 +80,7 @@ fn shoot(
     mouse: Res<ButtonInput<MouseButton>>,
     mut commands: Commands,
     mut query_player: Query<&mut player::Player>,
+    mut sound_events: EventWriter<sound::SoundEvents>,
     time: Res<Time>,
     window_query: Query<&Window>,
 ) {
@@ -102,5 +104,6 @@ fn shoot(
             projectiles::Projectile,
         ));
         player.reset_shoot_time();
+        sound_events.send(sound::SoundEvents::Projectile);
     }
 }
