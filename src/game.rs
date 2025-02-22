@@ -59,16 +59,11 @@ impl Game {
 
     fn get_enemies_for_level(level: &Level) -> u8 {
         match level {
-            // Level::One => 20,
-            // Level::Two => 25,
-            // Level::Three => 30,
-            // Level::Four => 35,
-            // Level::Five => 40,
-            Level::One => 1,
-            Level::Two => 2,
-            Level::Three => 3,
-            Level::Four => 4,
-            Level::Five => 5,
+            Level::One => 15,
+            Level::Two => 20,
+            Level::Three => 25,
+            Level::Four => 30,
+            Level::Five => 35,
         }
     }
 
@@ -99,8 +94,7 @@ impl Game {
     fn get_next_level(&self) -> Option<Level> {
         match self.level {
             Level::One => Some(Level::Two),
-            // Level::Two => Some(Level::Three),
-            Level::Two => None,
+            Level::Two => Some(Level::Three),
             Level::Three => Some(Level::Four),
             Level::Four => Some(Level::Five),
             Level::Five => None,
@@ -149,7 +143,7 @@ fn jump_to_next_lvl(
     mut next_state: ResMut<NextState<GameState>>,
     mut text_events: EventWriter<texts::TextEvents>,
 ) {
-    if keys.just_pressed(KeyCode::Space) {
+    if keys.just_pressed(KeyCode::Enter) {
         enemy::setup(
             commands,
             asset_server,

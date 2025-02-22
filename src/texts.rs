@@ -13,9 +13,9 @@ impl Plugin for TextsPlugin {
 
 #[derive(Event)]
 pub enum TextEvents {
+    Clear,
     GameCompleted,
     GameOver,
-    Clear,
     LevelCompleted,
     Paused,
 }
@@ -127,7 +127,7 @@ fn handle_text_events(
         match event {
             TextEvents::LevelCompleted => {
                 primary_text.0 = "LEVEL COMPLETED!".to_string();
-                secondary_text.0 = "Press space key to continue to the next level".to_string();
+                secondary_text.0 = "Press Enter key to continue to the next level".to_string();
             }
             TextEvents::GameOver => {
                 primary_text.0 = "GAME OVER".to_string();

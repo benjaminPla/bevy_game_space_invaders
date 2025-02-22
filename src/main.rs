@@ -1,11 +1,12 @@
 mod animations;
+mod background;
 mod collisions;
 mod constants;
+mod controls;
 mod enemy;
 mod enemy_movement;
 mod game;
 mod player;
-mod controls;
 mod projectiles;
 mod texts;
 
@@ -24,6 +25,7 @@ impl Plugin for MainPlugin {
             .add_systems(Startup, setup)
             .add_plugins((
                 animations::AnimationPlugin,
+                background::BackgroundPlugin,
                 collisions::CollisionsPlugin,
                 controls::ControlsPlugin,
                 enemy::EnemyPlugin,
@@ -38,4 +40,5 @@ impl Plugin for MainPlugin {
 
 fn setup(mut commands: Commands) {
     commands.spawn(Camera2d);
+    commands.insert_resource(ClearColor(Color::srgb(0., 0., 0.)));
 }
