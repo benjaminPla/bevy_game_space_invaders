@@ -1,5 +1,6 @@
 use crate::game;
 use bevy::prelude::*;
+use bevy_kira_audio::prelude::{AudioSource, *};
 
 #[derive(Component)]
 pub struct SoundPlugin;
@@ -12,6 +13,14 @@ impl Plugin for SoundPlugin {
     }
 }
 
+#[derive(Resource)]
+struct SoundResource {
+    explosion: Handle<AudioSource>,
+    game_over: Handle<AudioSource>,
+    level_completed: Handle<AudioSource>,
+    projectile: Handle<AudioSource>,
+}
+
 #[derive(Event)]
 pub enum SoundEvents {
     Explosion,
@@ -20,44 +29,24 @@ pub enum SoundEvents {
     Projectile,
 }
 
-fn setup(asset_server: Res<AssetServer>, mut commands: Commands) {
-    commands.spawn((
-        AudioPlayer::new(asset_server.load("sounds/background.mp3")),
-        PlaybackSettings::LOOP,
-    ));
+fn setup(asset_server: Res<AssetServer>, audio: Res<Audio>, mut commands: Commands) {
+    let sound_resource = SoundResource {
+        explosion: asset_server.load("sounds/explosion.mp3"),
+        game_over: asset_server.load("sounds/game_over.mp3"),
+        level_completed: asset_server.load("sounds/level_completed.mp3"),
+        projectile: asset_server.load("sounds/projectile.mp3"),
+    };
+    commands.insert_resource(sound_resource);
+    audio.play(asset_server.load("sounds/music.mp3")).looped();
 }
 
-fn sounds(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut events: EventReader<SoundEvents>,
-) {
+fn sounds(audio: Res<Audio>, mut events: EventReader<SoundEvents>, sounds: Res<SoundResource>) {
     for event in events.read() {
         match event {
-            SoundEvents::Explosion => {
-                commands.spawn((
-                    AudioPlayer::new(asset_server.load("sounds/explosion.mp3")),
-                    PlaybackSettings::ONCE,
-                ));
-            }
-            SoundEvents::GameOver => {
-                commands.spawn((
-                    AudioPlayer::new(asset_server.load("sounds/game_over.mp3")),
-                    PlaybackSettings::ONCE,
-                ));
-            }
-            SoundEvents::LevelCompleted => {
-                commands.spawn((
-                    AudioPlayer::new(asset_server.load("sounds/level_completed.mp3")),
-                    PlaybackSettings::ONCE,
-                ));
-            }
-            SoundEvents::Projectile => {
-                commands.spawn((
-                    AudioPlayer::new(asset_server.load("sounds/projectile.mp3")),
-                    PlaybackSettings::ONCE,
-                ));
-            }
-        }
+            SoundEvents::Explosion => audio.play(sounds.explosion.clone()),
+            SoundEvents::GameOver => audio.play(sounds.game_over.clone()),
+            SoundEvents::LevelCompleted => audio.play(sounds.level_completed.clone()),
+            SoundEvents::Projectile => audio.play(sounds.projectile.clone()),
+        };
     }
 }

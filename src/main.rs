@@ -1,5 +1,4 @@
 mod animations;
-mod sound;
 mod background;
 mod collisions;
 mod constants;
@@ -9,9 +8,11 @@ mod enemy_movement;
 mod game;
 mod player;
 mod projectiles;
+mod sound;
 mod texts;
 
 use bevy::prelude::*;
+use bevy_kira_audio::prelude::*;
 
 fn main() {
     App::new().add_plugins(MainPlugin).run();
@@ -21,7 +22,7 @@ pub struct MainPlugin;
 
 impl Plugin for MainPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(DefaultPlugins)
+        app.add_plugins((DefaultPlugins, AudioPlugin))
             .init_state::<game::GameState>()
             .add_systems(Startup, setup)
             .add_plugins((
