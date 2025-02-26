@@ -9,6 +9,7 @@ mod game;
 mod player;
 mod projectiles;
 mod sound;
+mod sprites;
 mod texts;
 
 use bevy::prelude::*;
@@ -24,10 +25,9 @@ impl Plugin for MainPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins((DefaultPlugins, AudioPlugin))
             .init_state::<game::GameState>()
-            .add_systems(Startup, setup)
+            .add_systems(PreStartup, setup)
             .add_plugins((
                 animations::AnimationPlugin,
-                sound::SoundPlugin,
                 background::BackgroundPlugin,
                 collisions::CollisionsPlugin,
                 controls::ControlsPlugin,
@@ -36,6 +36,8 @@ impl Plugin for MainPlugin {
                 game::GamePlugin,
                 player::PlayerPlugin,
                 projectiles::ProjectilesPlugin,
+                sound::SoundPlugin,
+                sprites::SpritesPlugin,
                 texts::TextsPlugin,
             ));
     }

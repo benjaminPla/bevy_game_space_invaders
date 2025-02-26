@@ -1,5 +1,6 @@
 use crate::enemy;
 use crate::sound;
+use crate::sprites;
 use crate::texts;
 use bevy::prelude::*;
 
@@ -138,21 +139,21 @@ fn level_completed(
 
 fn jump_to_next_lvl(
     commands: Commands,
-    asset_server: Res<AssetServer>,
-    texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
-    window_query: Query<&Window>,
     game: Res<Game>,
     keys: Res<ButtonInput<KeyCode>>,
     mut next_state: ResMut<NextState<GameState>>,
     mut text_events: EventWriter<texts::TextEvents>,
+    sprites_resource: Res<sprites::SpritesResource>,
+    texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
+    window_query: Query<&Window>,
 ) {
     if keys.just_pressed(KeyCode::Enter) {
         enemy::setup(
-            commands,
-            asset_server,
-            texture_atlas_layouts,
-            window_query,
             game,
+            commands,
+            texture_atlas_layouts,
+            sprites_resource,
+            window_query,
         );
         next_state.set(GameState::Playing);
         text_events.send(texts::TextEvents::Clear);

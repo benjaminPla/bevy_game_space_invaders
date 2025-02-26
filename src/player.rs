@@ -1,5 +1,6 @@
 use crate::animations;
 use crate::collisions;
+use crate::sprites;
 use bevy::prelude::*;
 use std::time::Duration;
 
@@ -68,13 +69,13 @@ impl Player {
 
 fn setup(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
+    sprites_resource: Res<sprites::SpritesResource>,
     window_query: Query<&Window>,
 ) {
     let window = window_query.single();
 
-    let texture = asset_server.load("player.png");
+    let texture = sprites_resource.player.clone();
 
     let layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 2, 1, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);

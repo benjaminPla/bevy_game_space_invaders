@@ -12,7 +12,7 @@ pub struct EnemyMovement {
 
 impl Plugin for EnemyMovementPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, setup);
+        app.add_systems(PreStartup, setup);
         app.add_systems(Update, movement.run_if(in_state(game::GameState::Playing)));
     }
 }

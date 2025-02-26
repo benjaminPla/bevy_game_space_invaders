@@ -7,7 +7,7 @@ pub struct SoundPlugin;
 
 impl Plugin for SoundPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, setup)
+        app.add_systems(PreStartup, setup)
             .add_event::<SoundEvents>()
             .add_systems(Update, sounds.run_if(in_state(game::GameState::Playing)));
     }

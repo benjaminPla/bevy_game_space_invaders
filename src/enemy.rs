@@ -2,6 +2,7 @@ use crate::animations;
 use crate::collisions;
 use crate::constants;
 use crate::game;
+use crate::sprites;
 use bevy::prelude::*;
 
 pub struct EnemyPlugin;
@@ -16,14 +17,14 @@ impl Plugin for EnemyPlugin {
 pub struct Enemy;
 
 pub fn setup(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
-    window_query: Query<&Window>,
     game: Res<game::Game>,
+    mut commands: Commands,
+    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
+    sprites_resource: Res<sprites::SpritesResource>,
+    window_query: Query<&Window>,
 ) {
     let window = window_query.single();
-    let texture = asset_server.load("alien.png");
+    let texture = sprites_resource.enemy.clone();
 
     let layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 2, 1, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);

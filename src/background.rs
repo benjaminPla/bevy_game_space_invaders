@@ -1,5 +1,6 @@
 use crate::animations;
 use crate::constants;
+use crate::sprites;
 use bevy::prelude::*;
 use rand::prelude::*;
 
@@ -25,16 +26,16 @@ impl BackgroundComponent {
 
 fn setup(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
+    sprites_resource: Res<sprites::SpritesResource>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
     window_query: Query<&Window>,
 ) {
     let window = window_query.single();
     let mut rng = rand::rng();
 
-    let star_small_texture: Handle<Image> = asset_server.load("star_small.png");
-    let star_big_texture: Handle<Image> = asset_server.load("star_big.png");
-    let planet_texture: Handle<Image> = asset_server.load("planet.png");
+    let star_small_texture: Handle<Image> = sprites_resource.star_small.clone();
+    let star_big_texture: Handle<Image> = sprites_resource.star_big.clone();
+    let planet_texture: Handle<Image> = sprites_resource.planet.clone();
 
     let star_small_layout = TextureAtlasLayout::from_grid(UVec2::splat(4), 1, 2, None, None);
     let star_big_layout = TextureAtlasLayout::from_grid(UVec2::splat(8), 1, 2, None, None);
