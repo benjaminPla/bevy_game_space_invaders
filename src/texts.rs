@@ -5,7 +5,7 @@ pub struct TextsPlugin;
 
 impl Plugin for TextsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, setup)
+        app.add_systems(PreStartup, setup)
             .add_event::<TextEvents>()
             .add_systems(Update, (points, enemies, handle_text_events));
     }
