@@ -13,7 +13,6 @@ mod sprites;
 mod texts;
 
 use bevy::prelude::*;
-use bevy_kira_audio::prelude::*;
 
 fn main() {
     App::new().add_plugins(MainPlugin).run();
@@ -23,9 +22,9 @@ pub struct MainPlugin;
 
 impl Plugin for MainPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins((DefaultPlugins, AudioPlugin))
+        app.add_plugins(DefaultPlugins)
             .init_state::<game::GameState>()
-            .add_systems(PreStartup, setup)
+            .add_systems(Startup, setup)
             .add_plugins((
                 animations::AnimationPlugin,
                 background::BackgroundPlugin,

@@ -5,7 +5,7 @@ pub struct SpritesPlugin;
 
 impl Plugin for SpritesPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(PreStartup, setup);
+        app.add_systems(Startup, setup);
     }
 }
 

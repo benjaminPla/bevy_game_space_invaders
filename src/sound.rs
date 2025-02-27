@@ -7,8 +7,10 @@ pub struct SoundPlugin;
 
 impl Plugin for SoundPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(PreStartup, setup)
+        app.add_plugins(AudioPlugin)
+            .add_systems(Startup, setup)
             .add_event::<SoundEvents>()
+            .add_systems(PostStartup, music)
             .add_systems(Update, sounds.run_if(in_state(game::GameState::Playing)));
     }
 }
@@ -18,6 +20,7 @@ struct SoundResource {
     explosion: Handle<AudioSource>,
     game_over: Handle<AudioSource>,
     level_completed: Handle<AudioSource>,
+    music: Handle<AudioSource>,
     projectile: Handle<AudioSource>,
 }
 
@@ -29,15 +32,19 @@ pub enum SoundEvents {
     Projectile,
 }
 
-fn setup(asset_server: Res<AssetServer>, audio: Res<Audio>, mut commands: Commands) {
+fn setup(asset_server: Res<AssetServer>, mut commands: Commands) {
     let sound_resource = SoundResource {
         explosion: asset_server.load("sounds/explosion.mp3"),
         game_over: asset_server.load("sounds/game_over.mp3"),
         level_completed: asset_server.load("sounds/level_completed.mp3"),
+        music: asset_server.load("sounds/music.mp3"),
         projectile: asset_server.load("sounds/projectile.mp3"),
     };
     commands.insert_resource(sound_resource);
-    audio.play(asset_server.load("sounds/music.mp3")).looped();
+}
+
+fn music(audio: Res<Audio>, sound_resource: Res<SoundResource>) {
+    audio.play(sound_resource.music.clone()).looped();
 }
 
 fn sounds(audio: Res<Audio>, mut events: EventReader<SoundEvents>, sounds: Res<SoundResource>) {

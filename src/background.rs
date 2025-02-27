@@ -9,7 +9,8 @@ pub struct BackgroundPlugin;
 
 impl Plugin for BackgroundPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, setup).add_systems(Update, animate);
+        app.add_systems(PostStartup, setup)
+            .add_systems(Update, animate);
     }
 }
 
