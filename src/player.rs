@@ -1,7 +1,7 @@
 use crate::animations;
+use crate::assets;
 use crate::collisions;
-use crate::sprites;
-use bevy::prelude::*;
+use bevy::{asset::*, prelude::*};
 use std::time::Duration;
 
 #[derive(Component)]
@@ -9,7 +9,7 @@ pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(PostStartup, setup);
+        app.add_systems(OnEnter(crate::game::GameState::Playing), setup);
     }
 }
 
@@ -70,12 +70,12 @@ impl Player {
 fn setup(
     mut commands: Commands,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
-    sprites_resource: Res<sprites::SpritesResource>,
+    sprite_assets: Res<assets::SpriteAssets>,
     window_query: Query<&Window>,
 ) {
     let window = window_query.single();
 
-    let texture = sprites_resource.player.clone();
+    let texture = sprite_assets.player.clone();
 
     let layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 2, 1, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);

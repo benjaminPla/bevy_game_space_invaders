@@ -1,6 +1,6 @@
 use crate::animations;
+use crate::assets;
 use crate::constants;
-use crate::sprites;
 use bevy::prelude::*;
 use rand::prelude::*;
 
@@ -9,7 +9,7 @@ pub struct BackgroundPlugin;
 
 impl Plugin for BackgroundPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(PostStartup, setup)
+        app.add_systems(OnEnter(crate::game::GameState::Playing), setup)
             .add_systems(Update, animate);
     }
 }
@@ -27,16 +27,16 @@ impl BackgroundComponent {
 
 fn setup(
     mut commands: Commands,
-    sprites_resource: Res<sprites::SpritesResource>,
+    sprites_resource: Res<assets::SpriteAssets>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
     window_query: Query<&Window>,
 ) {
     let window = window_query.single();
     let mut rng = rand::rng();
 
-    let star_small_texture: Handle<Image> = sprites_resource.star_small.clone();
-    let star_big_texture: Handle<Image> = sprites_resource.star_big.clone();
-    let planet_texture: Handle<Image> = sprites_resource.planet.clone();
+    let star_small_texture = sprites_resource.star_small.clone();
+    let star_big_texture = sprites_resource.star_big.clone();
+    let planet_texture = sprites_resource.planet.clone();
 
     let star_small_layout = TextureAtlasLayout::from_grid(UVec2::splat(4), 1, 2, None, None);
     let star_big_layout = TextureAtlasLayout::from_grid(UVec2::splat(8), 1, 2, None, None);

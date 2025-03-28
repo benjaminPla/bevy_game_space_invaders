@@ -1,15 +1,15 @@
 use crate::animations;
+use crate::assets;
 use crate::collisions;
 use crate::constants;
 use crate::game;
-use crate::sprites;
 use bevy::prelude::*;
 
 pub struct EnemyPlugin;
 
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(PostStartup, setup);
+        app.add_systems(OnEnter(crate::game::GameState::Playing), setup);
     }
 }
 
@@ -20,11 +20,11 @@ pub fn setup(
     game: Res<game::Game>,
     mut commands: Commands,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
-    sprites_resource: Res<sprites::SpritesResource>,
+    sprite_assets: Res<assets::SpriteAssets>,
     window_query: Query<&Window>,
 ) {
     let window = window_query.single();
-    let texture = sprites_resource.enemy.clone();
+    let texture = sprite_assets.enemy.clone();
 
     let layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 2, 1, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);

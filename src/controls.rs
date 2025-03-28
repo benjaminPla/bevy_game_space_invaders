@@ -1,9 +1,9 @@
+use crate::assets;
 use crate::collisions;
 use crate::game;
 use crate::player;
 use crate::projectiles;
 use crate::sound;
-use crate::sprites;
 use crate::texts;
 use bevy::prelude::*;
 
@@ -81,7 +81,7 @@ fn shoot(
     mut commands: Commands,
     mut query_player: Query<&mut player::Player>,
     mut sound_events: EventWriter<sound::SoundEvents>,
-    sprites_resource: Res<sprites::SpritesResource>,
+    sprite_assets: Res<assets::SpriteAssets>,
     time: Res<Time>,
     window_query: Query<&Window>,
 ) {
@@ -93,7 +93,7 @@ fn shoot(
     let shooting_press = keys.pressed(KeyCode::Space) || mouse.pressed(MouseButton::Left);
 
     if shooting_press && player.get_can_shoot() {
-        let texture = sprites_resource.projectile.clone();
+        let texture = sprite_assets.projectile.clone();
 
         commands.spawn((
             Sprite {

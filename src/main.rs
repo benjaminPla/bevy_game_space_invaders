@@ -1,4 +1,5 @@
 mod animations;
+mod assets;
 mod background;
 mod collisions;
 mod constants;
@@ -9,10 +10,10 @@ mod game;
 mod player;
 mod projectiles;
 mod sound;
-mod sprites;
 mod texts;
 
 use bevy::prelude::*;
+use bevy_asset_loader::prelude::*;
 
 fn main() {
     App::new().add_plugins(MainPlugin).run();
@@ -25,6 +26,18 @@ impl Plugin for MainPlugin {
         app.add_plugins(DefaultPlugins)
             .init_state::<game::GameState>()
             .add_systems(Startup, setup)
+            .add_loading_state(
+                LoadingState::new(game::GameState::Loading)
+                    .load_collection::<assets::AudioAssets>()
+                    .load_collection::<assets::FontAssets>()
+                    .load_collection::<assets::SpriteAssets>()
+                    .continue_to_state(game::GameState::Playing),
+            )
+            // move this to a plugin
+            .add_systems(
+                OnEnter(game::GameState::Playing),
+                assets::start_background_audio,
+            )
             .add_plugins((
                 animations::AnimationPlugin,
                 background::BackgroundPlugin,
@@ -36,7 +49,6 @@ impl Plugin for MainPlugin {
                 player::PlayerPlugin,
                 projectiles::ProjectilesPlugin,
                 sound::SoundPlugin,
-                sprites::SpritesPlugin,
                 texts::TextsPlugin,
             ));
     }

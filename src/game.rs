@@ -1,6 +1,6 @@
+use crate::assets;
 use crate::enemy;
 use crate::sound;
-use crate::sprites;
 use crate::texts;
 use bevy::prelude::*;
 
@@ -22,8 +22,9 @@ pub enum GameState {
     GameCompleted,
     GameOver,
     LevelCompleted,
-    Paused,
     #[default]
+    Loading,
+    Paused,
     Playing,
 }
 
@@ -143,7 +144,7 @@ fn jump_to_next_lvl(
     keys: Res<ButtonInput<KeyCode>>,
     mut next_state: ResMut<NextState<GameState>>,
     mut text_events: EventWriter<texts::TextEvents>,
-    sprites_resource: Res<sprites::SpritesResource>,
+    sprites_resource: Res<assets::SpriteAssets>,
     texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
     window_query: Query<&Window>,
 ) {

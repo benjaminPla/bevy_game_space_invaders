@@ -12,8 +12,8 @@ pub struct EnemyMovement {
 
 impl Plugin for EnemyMovementPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(PostStartup, setup);
-        app.add_systems(Update, movement.run_if(in_state(game::GameState::Playing)));
+        app.add_systems(OnEnter(crate::game::GameState::Playing), setup)
+            .add_systems(Update, movement.run_if(in_state(game::GameState::Playing)));
     }
 }
 
